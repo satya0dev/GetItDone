@@ -2,10 +2,12 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
+const PUBLIC_ROUTES = ['/', '/login']
+
 export async function middleware(request: NextRequest) {
   const res = NextResponse.next()
   const supabase = createMiddlewareClient({ req: request, res })
-
+  
   // Refresh session if expired - required for Server Components
   await supabase.auth.getSession()
 
@@ -13,12 +15,20 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Auth condition
-  if (!user && !request.nextUrl.pathname.startsWith('/login')) {
+  const path = request.nextUrl.pathname
+
+  // Allow access to public routes
+  if (PUBLIC_ROUTES.includes(path)) {
+    return res
+  }
+
+  // Redirect to login if accessing protected route without auth
+  if (!user) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  if (user && request.nextUrl.pathname === '/login') {
+  // Redirect to dashboard if logged in user tries to access login page
+  if (user && path === '/login') {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
