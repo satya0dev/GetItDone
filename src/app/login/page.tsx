@@ -3,8 +3,32 @@
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 import { Github } from 'lucide-react'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function LoginPage() {
+  const router = useRouter()
+
+  useEffect(() => {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        router.push('/')
+      }
+    })
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        router.push('/')
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [router])
+
   const handleGithubLogin = async () => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({

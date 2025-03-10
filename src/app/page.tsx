@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ProjectCard } from '@/components/ProjectCard'
+import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabase'
 
 // Types
 interface Project {
@@ -46,6 +48,27 @@ const dummyProjects: Project[] = [
 
 export default function HomePage() {
   const [projects, setProjects] = useState<Project[]>(dummyProjects)
+  const router = useRouter()
+
+  useEffect(() => {
+    // Check if user is authenticated
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        router.push('/login')
+      }
+    })
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        router.push('/login')
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [router])
 
   const handleInterested = (projectId: string) => {
     // This will be replaced with actual functionality later
