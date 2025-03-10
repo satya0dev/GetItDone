@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { ProjectCard } from '@/components/ProjectCard'
-import { Navbar } from '@/components/Navbar'
 
 // Types
 interface Project {
@@ -55,7 +54,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Navbar />
       <main className="flex-grow container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold text-center mb-8">Available Projects</h1>
         

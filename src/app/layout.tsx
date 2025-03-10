@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Navbar } from "@/components/Navbar";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "GetItDone - Find Your Next Project",
-  description: "Connect with freelancers for your projects",
+  title: "GetItDone",
+  description: "Get your tasks done efficiently",
 };
 
 export default function RootLayout({
@@ -15,8 +17,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <Navbar />
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
