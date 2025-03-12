@@ -1,97 +1,181 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { ProjectCard } from '@/components/ProjectCard'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { ProjectCard } from '@/components/ProjectCard'
+import { toast } from 'sonner'
 
 // Types
 interface Project {
   id: string
   title: string
+  description: string
   category: string
-  estimatedPrice: number
+  difficulty_level: string
   deadline: string
+  estimated_price: number
+  drive_link?: string
+  interested_freelancers: any[]
+  approved_freelancer?: string
+  status: 'Open' | 'In Progress' | 'Completed'
+  created_at: string
+  updated_at: string
 }
 
-// Dummy data
-const dummyProjects: Project[] = [
-  {
-    id: '1',
-    title: 'E-commerce Website Development',
-    category: 'Web Dev',
-    estimatedPrice: 2000,
-    deadline: '2024-04-15',
-  },
-  {
-    id: '2',
-    title: 'AI-Powered Chatbot',
-    category: 'AI/ML',
-    estimatedPrice: 1500,
-    deadline: '2024-04-20',
-  },
-  {
-    id: '3',
-    title: 'Mobile App UI Design',
-    category: 'Design',
-    estimatedPrice: 800,
-    deadline: '2024-04-10',
-  },
-  {
-    id: '4',
-    title: 'React Native Mobile App',
-    category: 'App Dev',
-    estimatedPrice: 3000,
-    deadline: '2024-05-01',
-  },
-]
-
 export default function HomePage() {
-  const [projects, setProjects] = useState<Project[]>(dummyProjects)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
     // Check if user is authenticated
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        router.push('/login')
-      }
+      console.log('Initial session check:', session ? 'Logged in' : 'Not logged in')
     })
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        router.push('/login')
-      }
+      console.log('Auth state changed:', session ? 'Logged in' : 'Not logged in')
     })
+
+    // Fetch projects
+    const fetchProjects = async () => {
+      try {
+        setIsLoading(true)
+        console.log('Fetching projects...')
+        
+        const { data, error } = await supabase
+          .from('projects')
+          .select('*')
+          .eq('status', 'Open')
+          .order('created_at', { ascending: false })
+
+        if (error) {
+          console.error('Error fetching projects:', error)
+          toast.error('Failed to load projects')
+          return
+        }
+
+        console.log('Fetched projects:', data)
+        if (!data || data.length === 0) {
+          console.log('No projects found in the database')
+        }
+        setProjects(data || [])
+      } catch (error) {
+        console.error('Error:', error)
+        toast.error('An unexpected error occurred while loading projects')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchProjects()
 
     return () => subscription.unsubscribe()
   }, [router])
 
-  const handleInterested = (projectId: string) => {
-    // This will be replaced with actual functionality later
-    console.log('Interested in project:', projectId)
+  const handleInterested = async (projectId: string, whatsappNumber: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast.error('Please log in to express interest in projects')
+        router.push('/login')
+        return
+      }
+
+      // First get the current interested_projects array
+      const { data: userData, error: fetchError } = await supabase
+        .from('users')
+        .select('interested_projects')
+        .eq('id', session.user.id)
+        .single()
+
+      if (fetchError) {
+        console.error('Fetch error:', fetchError)
+        toast.error('Failed to fetch user data. Please try again.')
+        return
+      }
+
+      const currentProjects = userData?.interested_projects || []
+
+      // Check if user has already shown interest in this project
+      if (currentProjects.includes(projectId)) {
+        toast.error('You have already expressed interest in this project')
+        return
+      }
+
+      // Check if user has already shown interest in 5 projects
+      if (currentProjects.length >= 5) {
+        toast.error('You can only show interest in up to 5 projects at a time')
+        return
+      }
+
+      // Update with the new project ID
+      const updatedProjects = [...currentProjects, projectId]
+
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          whatsapp_number: whatsappNumber,
+          interested_projects: updatedProjects,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', session.user.id)
+
+      if (updateError) {
+        console.error('Update error:', updateError)
+        if (updateError.code === '23505') { // Unique constraint violation
+          toast.error('This WhatsApp number is already registered')
+        } else {
+          toast.error('Failed to update user data. Please try again.')
+        }
+        return
+      }
+
+      // Show success message
+      toast.success('Successfully expressed interest in project')
+    } catch (error) {
+      console.error('Error:', error)
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error('An unexpected error occurred. Please try again.')
+      }
+    }
   }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-center mb-8">Available Projects</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              title={project.title}
-              category={project.category}
-              estimatedPrice={project.estimatedPrice}
-              deadline={project.deadline}
-              onInterested={() => handleInterested(project.id)}
-            />
-          ))}
+        <div className="flex flex-col items-center">
+          <h1 className="text-4xl font-bold text-center mb-8">Available Projects</h1>
         </div>
+        
+        {isLoading ? (
+          <div className="text-center text-muted-foreground">Loading projects...</div>
+        ) : projects.length === 0 ? (
+          <div className="text-center text-muted-foreground">
+            No projects available at the moment.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+            {projects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                title={project.title}
+                description={project.description}
+                category={project.category}
+                difficulty_level={project.difficulty_level}
+                estimatedPrice={project.estimated_price}
+                deadline={project.deadline}
+                onInterested={(whatsappNumber) => handleInterested(project.id, whatsappNumber)}
+              />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   )
