@@ -141,10 +141,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="w-full max-w-md space-y-8 p-8">
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold tracking-tight">
+    <div className="h-[100vh] w-full flex items-center justify-center bg-background overflow-hidden">
+      <div className="w-full max-w-md p-6">
+        <div className="text-center mb-6">
+          <h2 className="text-3xl font-bold tracking-tight">
             Welcome to GetItDone
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -153,12 +153,12 @@ export default function LoginPage() {
         </div>
 
         <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="login" className="space-y-4 mt-4">
+          <TabsContent value="login">
             <form onSubmit={handleEmailLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
@@ -187,31 +187,32 @@ export default function LoginPage() {
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? 'Logging in...' : 'Login with Email'}
               </Button>
+            
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
+                </div>
+              </div>
+              
+              <Button
+                onClick={handleGithubLogin}
+                className="w-full flex items-center justify-center gap-2"
+                variant="outline"
+                disabled={isLoading}
+                type="button"
+              >
+                <Github className="w-5 h-5" />
+                GitHub
+              </Button>
             </form>
-            
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-            
-            <Button
-              onClick={handleGithubLogin}
-              className="w-full flex items-center justify-center gap-2"
-              variant="outline"
-              disabled={isLoading}
-            >
-              <Github className="w-5 h-5" />
-              GitHub
-            </Button>
           </TabsContent>
           
-          <TabsContent value="signup" className="space-y-4 mt-4">
+          <TabsContent value="signup">
             <form onSubmit={handleEmailSignup} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Name</Label>
