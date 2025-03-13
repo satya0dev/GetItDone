@@ -1,7 +1,20 @@
 -- Create a function to handle new user signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
+DECLARE
+  name_value TEXT;
+  avatar_url_value TEXT;
 BEGIN
+  -- Set name from metadata or use email as fallback
+  name_value := NEW.raw_user_meta_data->>'name';
+  IF name_value IS NULL THEN
+    name_value := split_part(NEW.email, '@', 1);
+  END IF;
+  
+  -- Set avatar URL if available (GitHub login)
+  avatar_url_value := NEW.raw_user_meta_data->>'avatar_url';
+  
+  -- Insert into users table
   INSERT INTO public.users (
     id,
     name,
@@ -12,10 +25,10 @@ BEGIN
     updated_at
   ) VALUES (
     NEW.id,
-    NEW.raw_user_meta_data->>'name',
+    name_value,
     NEW.email,
     NEW.raw_user_meta_data->>'user_name',
-    NEW.raw_user_meta_data->>'avatar_url',
+    avatar_url_value,
     NEW.created_at,
     NEW.updated_at
   );
@@ -32,9 +45,9 @@ CREATE OR REPLACE TRIGGER on_auth_user_created
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
-CREATE POLICY "Allow authenticated users to view projects"
+DROP POLICY IF EXISTS "Allow authenticated users to view projects" ON projects;
+CREATE POLICY "Allow public to view projects"
 ON projects FOR SELECT
-TO authenticated
 USING (true);
 
 CREATE POLICY "Allow authenticated users to insert projects"

@@ -7,6 +7,7 @@ import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 interface ProjectCardProps {
   title: string
@@ -31,6 +32,7 @@ export function ProjectCard({
 }: ProjectCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isInterested, setIsInterested] = useState(false)
+  const router = useRouter()
 
   // Check if user has already shown interest in this project
   useEffect(() => {
@@ -65,18 +67,19 @@ export function ProjectCard({
   }
 
   const handleToggleInterest = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      toast.error('Please log in to express interest in projects')
+      router.push('/login')
+      return
+    }
+
     if (!isInterested) {
       setIsDialogOpen(true)
       return
     }
 
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        toast.error('Please log in to manage your interests')
-        return
-      }
-
       // Get current arrays from both tables
       const [userResponse, projectResponse] = await Promise.all([
         supabase
