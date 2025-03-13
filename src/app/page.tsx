@@ -86,20 +86,34 @@ export default function HomePage() {
         return
       }
 
-      // First get the current interested_projects array
-      const { data: userData, error: fetchError } = await supabase
-        .from('users')
-        .select('interested_projects')
-        .eq('id', session.user.id)
-        .single()
+      // First get the current interested_projects array and project data
+      const [userResponse, projectResponse] = await Promise.all([
+        supabase
+          .from('users')
+          .select('interested_projects')
+          .eq('id', session.user.id)
+          .single(),
+        supabase
+          .from('projects')
+          .select('interested_freelancers')
+          .eq('id', projectId)
+          .single()
+      ])
 
-      if (fetchError) {
-        console.error('Fetch error:', fetchError)
+      if (userResponse.error) {
+        console.error('User fetch error:', userResponse.error)
         toast.error('Failed to fetch user data. Please try again.')
         return
       }
 
-      const currentProjects = userData?.interested_projects || []
+      if (projectResponse.error) {
+        console.error('Project fetch error:', projectResponse.error)
+        toast.error('Failed to fetch project data. Please try again.')
+        return
+      }
+
+      const currentProjects = userResponse.data?.interested_projects || []
+      const currentFreelancers = projectResponse.data?.interested_freelancers || []
 
       // Check if user has already shown interest in this project
       if (currentProjects.includes(projectId)) {
@@ -113,21 +127,32 @@ export default function HomePage() {
         return
       }
 
-      // Update with the new project ID
+      // Update both arrays
       const updatedProjects = [...currentProjects, projectId]
+      const updatedFreelancers = [...currentFreelancers, session.user.id]
 
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({
-          whatsapp_number: whatsappNumber,
-          interested_projects: updatedProjects,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', session.user.id)
+      // Update both tables in parallel
+      const [updateUserResponse, updateProjectResponse] = await Promise.all([
+        supabase
+          .from('users')
+          .update({
+            whatsapp_number: whatsappNumber,
+            interested_projects: updatedProjects,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', session.user.id),
+        supabase
+          .from('projects')
+          .update({
+            interested_freelancers: updatedFreelancers,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', projectId)
+      ])
 
-      if (updateError) {
-        console.error('Update error:', updateError)
-        if (updateError.code === '23505') { // Unique constraint violation
+      if (updateUserResponse.error) {
+        console.error('Update user error:', updateUserResponse.error)
+        if (updateUserResponse.error.code === '23505') { // Unique constraint violation
           toast.error('This WhatsApp number is already registered')
         } else {
           toast.error('Failed to update user data. Please try again.')
@@ -135,8 +160,25 @@ export default function HomePage() {
         return
       }
 
+      if (updateProjectResponse.error) {
+        console.error('Update project error:', updateProjectResponse.error)
+        toast.error('Failed to update project data. Please try again.')
+        return
+      }
+
       // Show success message
       toast.success('Successfully expressed interest in project')
+      
+      // Refresh the projects list to update UI
+      const { data: refreshedProjects, error: refreshError } = await supabase
+        .from('projects')
+        .select('*')
+        .eq('status', 'Open')
+        .order('created_at', { ascending: false })
+        
+      if (!refreshError && refreshedProjects) {
+        setProjects(refreshedProjects)
+      }
     } catch (error) {
       console.error('Error:', error)
       if (error instanceof Error) {
@@ -165,6 +207,7 @@ export default function HomePage() {
             {projects.map((project) => (
               <ProjectCard
                 key={project.id}
+                projectId={project.id}
                 title={project.title}
                 description={project.description}
                 category={project.category}
