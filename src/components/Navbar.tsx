@@ -5,7 +5,6 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase"
-import { useTheme } from "next-themes"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,9 +21,11 @@ interface UserData {
 }
 
 export function Navbar() {
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<{
+    id: string;
+    email?: string;
+  } | null>(null)
   const [userData, setUserData] = useState<UserData | null>(null)
-  const { theme } = useTheme()
 
   useEffect(() => {
     // Get initial session
@@ -105,7 +106,7 @@ export function Navbar() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                   <UserAvatar 
-                    name={userData?.name || user.email} 
+                    name={userData?.name || user?.email || 'User'} 
                     avatarUrl={userData?.avatar_url} 
                   />
                 </Button>

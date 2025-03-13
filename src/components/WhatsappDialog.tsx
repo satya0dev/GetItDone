@@ -12,7 +12,6 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 import { supabase } from "@/lib/supabase"
-import { toast } from "sonner"
 
 interface WhatsappDialogProps {
   open: boolean

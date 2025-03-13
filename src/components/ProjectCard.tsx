@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CalendarDays, DollarSign, FileText, BarChart2, Check } from "lucide-react"
+import { CalendarDays, DollarSign, BarChart2, Check } from "lucide-react"
 import { WhatsappDialog } from "@/components/WhatsappDialog"
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"

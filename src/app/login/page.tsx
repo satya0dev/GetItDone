@@ -48,7 +48,7 @@ export default function LoginPage() {
   const handleGithubLogin = async () => {
     try {
       setIsLoading(true)
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'github',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`
@@ -82,7 +82,7 @@ export default function LoginPage() {
       setIsLoading(true)
       
       // Sign up with Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
+      const { error } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
         options: {
@@ -97,9 +97,9 @@ export default function LoginPage() {
       
       toast.success('Check your email to confirm your account')
       setActiveTab('login')
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error:', error)
-      toast.error(error.message || 'Failed to sign up. Please try again.')
+      toast.error(error instanceof Error ? error.message : 'Failed to sign up. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -117,7 +117,7 @@ export default function LoginPage() {
       setIsLoading(true)
       
       // Sign in with Supabase Auth
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email: loginEmail,
         password: loginPassword,
       })
@@ -132,9 +132,9 @@ export default function LoginPage() {
       }
       
       // Redirect will happen automatically via the auth state change listener
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error:', error)
-      toast.error(error.message || 'Failed to log in. Please try again.')
+      toast.error(error instanceof Error ? error.message : 'Failed to log in. Please try again.')
     } finally {
       setIsLoading(false)
     }

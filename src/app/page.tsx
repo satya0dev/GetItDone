@@ -16,7 +16,7 @@ interface Project {
   deadline: string
   estimated_price: number
   drive_link?: string
-  interested_freelancers: any[]
+  interested_freelancers: string[]  // Array of user IDs
   approved_freelancer?: string
   status: 'Open' | 'In Progress' | 'Completed'
   created_at: string
