@@ -12,7 +12,7 @@ export default function PrivacyPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">1. Introduction</h2>
             <p className="text-muted-foreground">
-              Welcome to GetDone ("we", "us", "our"). Your privacy is important to us, and we are committed to protecting 
+              Welcome to GetDone (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;). Your privacy is important to us, and we are committed to protecting 
               the information you share with us. This Privacy Policy explains how we collect, use, store, and safeguard 
               your personal data when you use our platform.
             </p>
@@ -20,8 +20,8 @@ export default function PrivacyPage() {
               For the purposes of this Privacy Policy:
             </p>
             <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-              <li>"User" or "Freelancer" refers to individuals who register on GetDone to complete projects.</li>
-              <li>"Client" or "Organization" refers to entities that post projects on GetDone and seek freelancers to complete them.</li>
+              <li>&quot;User&quot; or &quot;Freelancer&quot; refers to individuals who register on GetDone to complete projects.</li>
+              <li>&quot;Client&quot; or &quot;Organization&quot; refers to entities that post projects on GetDone and seek freelancers to complete them.</li>
             </ul>
           </section>
 
@@ -83,7 +83,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-semibold mb-4">7. Dispute Resolution and Refund Policy</h2>
             <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
               <li>In case of disputes, GetDone will act as a mediator to resolve issues fairly.</li>
-              <li>Refunds, if applicable, will be processed based on a case-by-case evaluation by GetDone's support team.</li>
+              <li>Refunds, if applicable, will be processed based on a case-by-case evaluation by GetDone&apos;s support team.</li>
             </ul>
           </section>
 

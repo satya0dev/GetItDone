@@ -95,7 +95,7 @@ export default function TermsPage() {
             <ul className="list-disc pl-6 space-y-2">
               <li>Refunds are allowed <strong>only if</strong> work on the project has <strong>not started</strong>.</li>
               <li>If a dispute arises, GetDone will <strong>review evidence</strong> and make a final decision.</li>
-              <li>Disputes must be resolved <strong>through GetDone's support team</strong>.</li>
+              <li>Disputes must be resolved <strong>through GetDone&apos;s support team</strong>.</li>
               <li>Users must respond to dispute queries <strong>within 3 days</strong>, or GetDone will make a decision based on available data.</li>
             </ul>
           </section>

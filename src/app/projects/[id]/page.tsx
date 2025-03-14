@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { CalendarDays, DollarSign, BarChart2, Check, ArrowLeft, FileText, Link as LinkIcon } from 'lucide-react'
+import { CalendarDays, BarChart2, Check, ArrowLeft, FileText, Link as LinkIcon, IndianRupee } from 'lucide-react'
 import { WhatsappDialog } from '@/components/WhatsappDialog'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -28,11 +28,8 @@ interface Project {
   updated_at: string
 }
 
-export default function ProjectDetailPage({ params }: { params: { id: string } }) {
-  // Unwrap params if it's a Promise
-  const unwrappedParams = params instanceof Promise ? use(params) : params;
-  const projectId = unwrappedParams.id;
-  
+export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: projectId } = use(params)
   const [project, setProject] = useState<Project | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -268,7 +265,7 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
   if (!project || !isAuthenticated) {
     return (
       <div className="container mx-auto px-4 py-8 flex justify-center items-center min-h-[60vh]">
-        <div className="text-center text-muted-foreground">Project not found or you don't have permission to view it.</div>
+        <div className="text-center text-muted-foreground">Project not found or you don&apos;t have permission to view it.</div>
       </div>
     )
   }
@@ -317,8 +314,8 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
                 </div>
               </div>
               <div className="flex items-center text-xl font-semibold">
-                <DollarSign className="h-5 w-5 mr-1" />
-                ${project.estimated_price}
+                <IndianRupee className="h-5 w-5 mr-1" />
+                {project.estimated_price}
               </div>
             </div>
           </CardHeader>

@@ -50,7 +50,7 @@ export default function AboutPage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4">Join Us</h2>
             <p className="text-muted-foreground">
-              Whether you're a student looking to work on exciting projects or an organization seeking skilled freelancers, 
+              Whether you&apos;re a student looking to work on exciting projects or an organization seeking skilled freelancers, 
               GetDone is the perfect place to connect. Join us today and be part of a growing community that values talent, 
               innovation, and efficiency.
             </p>

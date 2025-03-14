@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CalendarDays, DollarSign, BarChart2, Check, ExternalLink } from "lucide-react"
+import { CalendarDays, IndianRupee, BarChart2, Check, ExternalLink } from "lucide-react"
 import { WhatsappDialog } from "@/components/WhatsappDialog"
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
@@ -175,8 +175,8 @@ export function ProjectCard({
       <CardContent className="flex-grow">
         <div className="space-y-2">
           <div className="flex items-center text-sm text-muted-foreground">
-            <DollarSign className="mr-2 h-4 w-4" />
-            <span>Estimated Price: ${estimatedPrice}</span>
+            <IndianRupee className="mr-2 h-4 w-4" />
+            <span>Estimated Price: ₹{estimatedPrice}</span>
           </div>
           <div className="flex items-center text-sm text-muted-foreground">
             <CalendarDays className="mr-2 h-4 w-4" />
