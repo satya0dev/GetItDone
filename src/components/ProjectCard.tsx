@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CalendarDays, DollarSign, BarChart2, Check } from "lucide-react"
+import { CalendarDays, DollarSign, BarChart2, Check, ExternalLink } from "lucide-react"
 import { WhatsappDialog } from "@/components/WhatsappDialog"
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase"
@@ -152,6 +152,13 @@ export function ProjectCard({
     }
   }
 
+  // Check authentication before navigating to details page
+  const handleViewDetails = () => {
+    // Navigate directly to the project detail page without checking auth
+    // Let the page itself handle authentication
+    router.push(`/projects/${projectId}`)
+  }
+
   return (
     <Card className="flex flex-col h-full">
       <CardHeader>
@@ -181,7 +188,15 @@ export function ProjectCard({
           </div>
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-col space-y-3">
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={handleViewDetails}
+        >
+          <ExternalLink className="mr-2 h-4 w-4" />
+          View Details
+        </Button>
         <Button
           onClick={handleToggleInterest}
           className={cn(

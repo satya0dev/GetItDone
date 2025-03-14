@@ -29,7 +29,10 @@ export default function LoginPage() {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        router.push('/')
+        // Check for redirect parameter
+        const params = new URLSearchParams(window.location.search)
+        const redirectTo = params.get('redirectTo')
+        router.push(redirectTo || '/')
       }
     })
 
@@ -38,7 +41,10 @@ export default function LoginPage() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session) {
-        router.push('/')
+        // Check for redirect parameter
+        const params = new URLSearchParams(window.location.search)
+        const redirectTo = params.get('redirectTo')
+        router.push(redirectTo || '/')
       }
     })
 
