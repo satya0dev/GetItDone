@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { ProjectCard } from '@/components/ProjectCard'
 import { toast } from 'sonner'
+import { FlickeringGrid } from '@/components/magicui/flickering-grid'
 
 // Types
 interface Project {
@@ -190,8 +191,16 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <main className="flex-grow container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background flex flex-col relative">
+      <div className="absolute inset-0 z-0">
+        <FlickeringGrid 
+          color="rgb(59, 130, 246)" 
+          squareSize={4}
+          gridGap={6}
+          maxOpacity={0.1}
+        />
+      </div>
+      <main className="flex-grow container mx-auto px-4 py-8 relative z-10">
         <div className="flex flex-col items-center">
           <h1 className="text-4xl font-bold text-center mb-8">Available Projects</h1>
         </div>

@@ -2,6 +2,8 @@
 
 import * as React from "react"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import Link from "next/link"
 import {
   Drawer,
   DrawerClose,
@@ -24,7 +26,30 @@ export function WhatsappDialog({ open, onOpenChange, onSubmit }: WhatsappDialogP
   const [existingNumber, setExistingNumber] = React.useState<string | null>(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [error, setError] = React.useState("")
+  const [acceptedTerms, setAcceptedTerms] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const drawerContentRef = React.useRef<HTMLDivElement>(null)
+
+  // Reset states when dialog opens
+  React.useEffect(() => {
+    if (open) {
+      setAcceptedTerms(false)
+      setError("")
+    }
+  }, [open])
+
+  // Handle focus trap and initial focus
+  React.useEffect(() => {
+    if (open && drawerContentRef.current) {
+      const focusableElements = drawerContentRef.current.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (focusableElements.length > 0) {
+        const firstFocusable = focusableElements[0] as HTMLElement
+        firstFocusable.focus()
+      }
+    }
+  }, [open, isLoading])
 
   // Check if user already has a WhatsApp number
   React.useEffect(() => {
@@ -77,6 +102,12 @@ export function WhatsappDialog({ open, onOpenChange, onSubmit }: WhatsappDialogP
       return
     }
     
+    // Validate terms acceptance
+    if (!acceptedTerms) {
+      setError("Please accept the terms and conditions")
+      return
+    }
+
     // If entering a new number
     if (!validateWhatsappNumber(whatsappNumber)) {
       setError("Please enter a valid WhatsApp number")
@@ -117,7 +148,7 @@ export function WhatsappDialog({ open, onOpenChange, onSubmit }: WhatsappDialogP
   if (isLoading) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent>
+        <DrawerContent ref={drawerContentRef}>
           <DrawerHeader className="text-left">
             <DrawerTitle>Checking your information...</DrawerTitle>
             <DrawerDescription>
@@ -131,7 +162,7 @@ export function WhatsappDialog({ open, onOpenChange, onSubmit }: WhatsappDialogP
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent>
+      <DrawerContent ref={drawerContentRef}>
         <DrawerHeader className="text-left">
           <DrawerTitle>
             {existingNumber ? "Confirm WhatsApp Number" : "Enter WhatsApp Number"}
@@ -183,17 +214,30 @@ export function WhatsappDialog({ open, onOpenChange, onSubmit }: WhatsappDialogP
                   {error}
                 </p>
               )}
+              <div className="flex items-center space-x-2 mt-4">
+                <Checkbox 
+                  id="terms" 
+                  checked={acceptedTerms}
+                  onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                />
+                <label htmlFor="terms" className="text-sm text-muted-foreground">
+                  I agree to the{' '}
+                  <Link href="/terms" target="_blank" className="text-primary hover:underline">
+                    Terms and Conditions
+                  </Link>
+                </label>
+              </div>
             </div>
           )}
         </div>
         <DrawerFooter className="pt-2">
           {!existingNumber && (
-            <>
-              <Button onClick={handleSubmit}>Submit</Button>
+            <div className="flex justify-end gap-2">
               <DrawerClose asChild>
-                <Button variant="outline">Cancel</Button>
+                <Button variant="outline" className="flex-1 max-w-[200px]">Cancel</Button>
               </DrawerClose>
-            </>
+              <Button onClick={handleSubmit} className="flex-1 max-w-[200px]">Submit</Button>
+            </div>
           )}
         </DrawerFooter>
       </DrawerContent>
